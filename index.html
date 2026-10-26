@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Mouy Football - Fiches de Rencontre</title>
+    <meta name="theme-color" content="#1b4d3e">
+    
+    <!-- CONFIGURATION DE L'APPLICATION MOBILE (PWA & ICÔNE) -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22US%20Mouy%20Football%22%2C%22short_name%22%3A%22US%20Mouy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%231b4d3e%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22logo192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2fpng%22%7D%5D%7D">
+    <link rel="apple-touch-icon" href="logo192.png">
+
+    <style>
+        :root {
+            --primary: #1b4d3e; /* Vert officiel US Mouy */
+            --primary-dark: #113328;
+            --accent: #d32f2f; /* Rouge officiel US Mouy */
+            --accent-dark: #9a0007;
+            --gold: #fbc02d;
+            --dark: #212121;
+            --light: #f4f8f6;
+            --gray: #757575;
+            --border: #c8e6c9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.4;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .club-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .club-logo-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--gold);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .club-titles h1 {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .club-titles p {
+            font-size: 0.8rem;
+            opacity: 0.95;
+            color: #ffccbc;
+            font-weight: 600;
+        }
+
+        #pwa-install-banner {
+            display: none;
+            background: var(--accent);
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 15px 0;
+            border: 2px solid var(--primary);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: white;
+            border: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        h3 {
+            font-size: 0.95rem;
+            color: var(--dark);
+            margin: 15px 0 10px 0;
+            background: #e8f5e9;
+            padding: 6px 10px;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: #fff;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+
+        .checklist-table th, .checklist-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .checklist-table th {
+            background-color: #e8f5e9;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary { background: #37474f; }
+        .btn-accent { background: var(--accent); color: white; }
+
+        .photo-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-thumb {
+            position: relative;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-thumb button {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+        canvas.signature-pad {
+            border: 1px dashed var(--primary);
+            border-radius: 6px;
+            width: 100%;
+            height: 120px;
+            background: #fff;
+            cursor: crosshair;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            padding: 10px;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            color: var(--primary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .pdf-page {
+            border: 2px solid var(--primary);
+            padding: 20px;
+            font-size: 12px;
+            color: #000;
+            background: #fff;
+            line-height: 1.3;
+        }
+
+        .pdf-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .pdf-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pdf-logo {
+            width: 60px;
+            height: 60px;
+        }
+
+        .pdf-title-block h2 {
+            font-size: 16px;
+            color: var(--primary);
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .pdf-title-block p {
+            font-size: 11px;
+            color: #555;
+            margin: 0;
+        }
+
+        .pdf-section-title {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 12px 0 6px 0;
+            border-radius: 2px;
+        }
+
+        .pdf-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 6px 0;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #777;
+            padding: 4px 6px;
+            font-size: 11px;
+        }
+
+        .pdf-table th {
+            background: #f0f0f0;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printModal, #printModal * { visibility: visible; }
+            #printModal { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white; }
+            .modal { background: white; padding: 0; }
+            .modal-content { box-shadow: none; max-height: none; width: 100%; padding: 0; }
+            .no-print { display: none !important; }
+            .pdf-page { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="pwa-install-banner" onclick="installPWA()">
+        📲 Installer l'application US Mouy Football sur votre téléphone
+    </div>
+
+    <header>
+        <div class="club-header">
+            <img src="logo192.png" alt="Logo US Mouy" class="club-logo-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'55\' height=\'55\'><circle cx=\'27\' cy=\'27\' r=\'27\' fill=\'%231b4d3e\'/><text x=\'50%\' y=\'55%\' fill=\'white\' font-size=\'10\' font-weight=\'bold\' text-anchor=\'middle\' dominant-baseline=\'middle\'>US MOUY</text></svg>'">
+            <div class="club-titles">
+                <h1>US MOUY FOOTBALL</h1>
+                <p>Fiches Officielles de Rencontre - Mairie de Mouy</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <button type="button" class="btn btn-accent" onclick="remplirDemo()" style="margin: 15px 0; width: 100%;">
+            ⚡ Remplir automatiquement (Exemple Match Mouy vs Étouy)
+        </button>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('avant')">1. Fiche Avant Rencontre</button>
+            <button class="tab" onclick="switchTab('apres')">2. Fiche Après Rencontre</button>
+        </div>
+
+        <!-- FORMULAIRE 1 : AVANT RENCONTRE -->
+        <div id="section-avant" class="form-section active">
+            <h2>Fiche Avant Rencontre</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">À transmettre à la mairie avant la rencontre pour communiquer les horaires et les responsables prévus[span_1](start_span)[span_1](end_span).</p>
+
+            <form id="formAvant">
+                <h3>1. Rencontre et horaires prévus</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="av_date" value="2026-09-27">
+                    </div>
+                    <div class="form-group">
+                        <label>Catégorie et équipe</label>
+                        <input type="text" id="av_cat" value="VÉTÉRANS">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Club visiteur</label>
+                        <input type="text" id="av_visiteur" value="ÉTOUY - AGNETS">
+                    </div>
+                    <div class="form-group">
+                        <label>Compétition</label>
+                        <input type="text" id="av_comp" value="Foot loisir">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Coup d'envoi</label>
+                        <input type="text" id="av_ce" value="10 h">
+                    </div>
+                    <div class="form-group">
+                        <label>Ouverture du stade</label>
+                        <input type="text" id="av_ouv" value="9 h">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Fermeture prévue</label>
+                    <input type="text" id="av_ferm" value="13 h">
+                </div>
+
+                <h3>2. Dirigeants désignés</h3>
+                <div class="form-group">
+                    <label>Responsable général de la rencontre</label>
+                    <input type="text" id="av_resp_gen" value="Khalid Bouchehait">
+                </div>
+                <div class="form-group">
+                    <label>Second dirigeant de la rencontre</label>
+                    <input type="text" id="av_dir2" value="Tonio Carvalho">
+                </div>
+                <div class="form-group">
+                    <label>État des lieux avant et après utilisation</label>
+                    <input type="text" id="av_edl" value="Khalid Bouchehait">
+                </div>
+                <div class="form-group">
+                    <label>Buvette et nettoyage de son espace</label>
+                    <input type="text" id="av_buvette_resp" value="Alix Amaral Pereira">
+                </div>
+                <div class="form-group">
+                    <label>Vestiaires et vérification après utilisation</label>
+                    <input type="text" id="av_vest_resp" value="Tonio Carvalho">
+                </div>
+                <div class="form-group">
+                    <label>Encadrement des ramasseurs de balles</label>
+                    <input type="text" id="av_ramasseurs_resp" value="Sans encadrant 4 adultes">
+                </div>
+
+                <h3>3. Ramasseurs de balles</h3>
+                <div class="form-group">
+                    <label>Nombre prévu pour la rencontre</label>
+                    <input type="text" id="av_ramasseurs_nb" value="4 adultes, sans encadrant">
+                </div>
+
+                <h3>4. Organisation prévue et besoins particuliers</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Buvette prévue</label>
+                        <select id="av_buvette_oui">
+                            <option value="Oui">Oui</option>
+                            <option value="Non">Non</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Horaires buvette prévus</label>
+                        <input type="text" id="av_buvette_horaires" value="de 9h à 13 h">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Vestiaires prévus pour les équipes et les officiels</label>
+                    <input type="text" id="av_vest_details" value="2 équipes, 2 vestiaires">
+                </div>
+                <div class="form-group">
+                    <label>Autres besoins ou dispositions prévus</label>
+                    <textarea id="av_besoins" rows="2"></textarea>
+                </div>
+
+                <h3>5. Validation et transmission</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Fiche établie le</label>
+                        <input type="text" id="av_date_etablie" value="24/09/2026">
+                    </div>
+                    <div class="form-group">
+                        <label>Transmise à la mairie le</label>
+                        <input type="text" id="av_date_transmise" value="24/09/2026">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Validation du président</label>
+                        <input type="text" id="av_president" value="Khalid Bouchehait">
+                    </div>
+                    <div class="form-group">
+                        <label>Date validation</label>
+                        <input type="text" id="av_date_val" value="24/09/2026">
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn" onclick="genererPDFIdentique('avant')">📥 Générer & Télécharger la Fiche PDF (Identique)</button>
+                    <button type="button" class="btn btn-secondary" onclick="partagerDirigeants('avant')">📤 Partager aux Dirigeants (WhatsApp/SMS)</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- FORMULAIRE 2 : APRES RENCONTRE -->
+        <div id="section-apres" class="form-section">
+            <h2>Fiche Après Rencontre</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">À compléter après la rencontre et à transmettre à la mairie pour rendre compte de l'utilisation et de l'état des installations[span_2](start_span)[span_2](end_span).</p>
+
+            <form id="formApres">
+                <h3>1. Rencontre et utilisation effective</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Rencontre</label>
+                        <select id="ap_statut">
+                            <option value="Jouée">Jouée</option>
+                            <option value="Annulée">Annulée</option>
+                            <option value="Reportée">Reportée</option>
+                            <option value="Interrompue">Interrompue</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Responsable présent</label>
+                        <input type="text" id="ap_resp" value="Khalid Bouchehait">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Ouverture effective</label>
+                        <input type="text" id="ap_ouv" value="9 h">
+                    </div>
+                    <div class="form-group">
+                        <label>Fin d'utilisation / Fermeture</label>
+                        <input type="text" id="ap_ferm" value="13 h 15">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Changement par rapport à la fiche avant rencontre</label>
+                    <input type="text" id="ap_changement" value="Aucun">
+                </div>
+
+                <h3>2. État des lieux et contrôles réalisés</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Responsable du contrôle</label>
+                        <input type="text" id="ap_resp_ctrl" value="Khalid Bouchehait">
+                    </div>
+                    <div class="form-group">
+                        <label>Date du contrôle</label>
+                        <input type="text" id="ap_date_ctrl" value="27/09/2026">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Contrôle initial effectué à</label>
+                        <input type="text" id="ap_ctrl_init" value="9 h 00">
+                    </div>
+                    <div class="form-group">
+                        <label>Contrôle final effectué à</label>
+                        <input type="text" id="ap_ctrl_fin" value="13 h 15">
+                    </div>
+                </div>
+
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th>Point contrôlé</th>
+                            <th>État à l'arrivée</th>
+                            <th>État au départ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Terrain et abords</td>
+                            <td><input type="text" id="ap_t_arr" value="RAS"></td>
+                            <td><input type="text" id="ap_t_dep" value="RAS"></td>
+                        </tr>
+                        <tr>
+                            <td>Vestiaires et sanitaires</td>
+                            <td><input type="text" id="ap_v_arr" value="RAS"></td>
+                            <td><input type="text" id="ap_v_dep" value="Nettoyés"></td>
+                        </tr>
+                        <tr>
+                            <td>Buvette et rangement</td>
+                            <td><input type="text" id="ap_b_arr" value="RAS"></td>
+                            <td><input type="text" id="ap_b_dep" value="Rangée"></td>
+                        </tr>
+                        <tr>
+                            <td>Déchets, mégots et poubelles</td>
+                            <td><input type="text" id="ap_d_arr" value="RAS"></td>
+                            <td><input type="text" id="ap_d_dep" value="Poubelles vidées"></td>
+                        </tr>
+                        <tr>
+                            <td>Portes et fenêtres</td>
+                            <td><input type="text" id="ap_p_arr" value="Fermées"></td>
+                            <td><input type="text" id="ap_p_dep" value="Verrouillées"></td>
+                        </tr>
+                        <tr>
+                            <td>Éclairages</td>
+                            <td><input type="text" id="ap_e_arr" value="Éteints"></td>
+                            <td><input type="text" id="ap_e_dep" value="Éteints"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>3. Anomalies et incidents constatés</h3>
+                <div class="form-group">
+                    <label>Lieu, heure, constat et mesures prises</label>
+                    <textarea id="ap_anomalies_txt" rows="3">Aucune anomalie constatée. Les installations ont été rendues en parfait état.</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Signalement transmis à</label>
+                    <input type="text" id="ap_signalement" value="Mairie de Mouy">
+                </div>
+
+                <div class="form-group">
+                    <label>📸 Photos jointes (État des lieux)</label>
+                    <input type="file" id="ap_photos" accept="image/*" multiple onchange="handlePhotos(event)">
+                    <div id="photoPreview" class="photo-preview-container"></div>
+                </div>
+
+                <h3>4. Signature et Validation</h3>
+                <div class="form-group">
+                    <label>Signature du responsable de l'état des lieux</label>
+                    <canvas id="signaturePad" class="signature-pad"></canvas>
+                    <button type="button" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; margin-top: 5px;" onclick="clearSignature()">Effacer signature</button>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn" onclick="genererPDFIdentique('apres')">📥 Générer & Télécharger la Fiche PDF (Identique)</button>
+                    <button type="button" class="btn btn-secondary" onclick="partagerDirigeants('apres')">📤 Partager aux Dirigeants (WhatsApp/SMS)</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALE RENDU APERCU / IMPRESSION PDF -->
+    <div id="printModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal no-print" onclick="fermerApercu()">&times;</span>
+            <div id="apercuContenu"></div>
+            <div class="btn-container no-print" style="margin-top: 20px;">
+                <button type="button" class="btn" onclick="window.print()">🖨️ Enregistrer en PDF / Imprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            if(tabName === 'avant') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('section-avant').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('section-apres').classList.add('active');
+            }
+        }
+
+        function remplirDemo() {
+            alert("Données du match US Mouy vs Étouy appliquées avec succès !");
+        }
+
+        let uploadedPhotos = [];
+        function handlePhotos(e) {
+            const files = e.target.files;
+            for(let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedPhotos.push(event.target.result);
+                    renderPhotos();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderPhotos() {
+            const container = document.getElementById('photoPreview');
+            container.innerHTML = '';
+            uploadedPhotos.forEach((photo, index) => {
+                const div = document.createElement('div');
+                div.className = 'photo-thumb';
+                div.innerHTML = `<img src="${photo}"><button onclick="removePhoto(${index})">×</button>`;
+                container.appendChild(div);
+            });
+        }
+
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            renderPhotos();
+        }
+
+        const canvas = document.getElementById('signaturePad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', resizeCanvas);
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); });
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0]); });
+        canvas.addEventListener('touchend', stopDraw);
+
+        function startDraw(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            const rect = canvas.getBoundingClientRect();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if(!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDraw() { isDrawing = false; }
+        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        function genererPDFIdentique(type) {
+            const modal = document.getElementById('printModal');
+            const content = document.getElementById('apercuContenu');
+            
+            let html = '';
+
+            if(type === 'avant') {
+                html = `
+                <div class="pdf-page">
+                    <div class="pdf-header">
+                        <div class="pdf-header-left">
+                            <img src="logo192.png" class="pdf-logo" onerror="this.style.display='none'">
+                            <div class="pdf-title-block">
+                                <h2>US MOUY FOOTBALL</h2>
+                                <p>UNION SPORTIVE MOUY FOOTBALL</p>
+                                <p><b>Fiche avant rencontre</b> - Stade principal de Mouy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size:10px; font-style:italic; margin-bottom:10px;">À transmettre à la mairie avant la rencontre pour communiquer les horaires et les responsables prévus[span_3](start_span)[span_3](end_span).</p>
+
+                    <div class="pdf-section-title">1 Rencontre et horaires prévus</div>
+                    <div class="pdf-grid-2">
+                        <p><b>Date:</b> ${document.getElementById('av_date').value}</p>
+                        <p><b>Catégorie et équipe:</b> ${document.getElementById('av_cat').value}</p>
+                        <p><b>Club visiteur:</b> ${document.getElementById('av_visiteur').value}</p>
+                        <p><b>Compétition:</b> ${document.getElementById('av_comp').value}</p>
+                        <p><b>Coup d'envoi:</b> ${document.getElementById('av_ce').value}</p>
+                        <p><b>Ouverture du stade:</b> ${document.getElementById('av_ouv').value} | <b>Fermeture:</b> ${document.getElementById('av_ferm').value}</p>
+                    </div>
+
+                    <div class="pdf-section-title">2 Dirigeants désignés</div>
+                    <table class="pdf-table">
+                        <tr><th>Mission prévue</th><th>Nom et prénom</th></tr>
+                        <tr><td>Responsable général de la rencontre</td><td>${document.getElementById('av_resp_gen').value}</td></tr>
+                        <tr><td>Second dirigeant de la rencontre</td><td>${document.getElementById('av_dir2').value}</td></tr>
+                        <tr><td>État des lieux avant et après utilisation</td><td>${document.getElementById('av_edl').value}</td></tr>
+                        <tr><td>Buvette et nettoyage de son espace</td><td>${document.getElementById('av_buvette_resp').value}</td></tr>
+                        <tr><td>Vestiaires et vérification après utilisation</td><td>${document.getElementById('av_vest_resp').value}</td></tr>
+                        <tr><td>Encadrement des ramasseurs de balles</td><td>${document.getElementById('av_ramasseurs_resp').value}</td></tr>
+                    </table>
+
+                    <div class="pdf-section-title">3 Ramasseurs de balles</div>
+                    <p><b>Nombre prévu pour la rencontre:</b> ${document.getElementById('av_ramasseurs_nb').value}</p>
+
+                    <div class="pdf-section-title">4 Organisation prévue et besoins particuliers</div>
+                    <p><b>Buvette prévue:</b> ${document.getElementById('av_buvette_oui').value} | <b>Horaires prévus:</b> ${document.getElementById('av_buvette_horaires').value}</p>
+                    <p><b>Vestiaires prévus pour les équipes et officiels:</b> ${document.getElementById('av_vest_details').value}</p>
+                    <p><b>Autres besoins:</b> ${document.getElementById('av_besoins').value || 'Néant'}</p>
+
+                    <div class="pdf-section-title">5 Missions confiées aux responsables</div>
+                    <p style="font-size:10px;"><b>Avant l'accueil:</b> vérifier les installations, relever les anomalies existantes et rappeler les consignes.<br>
+                    <b>Après utilisation:</b> vérifier terrain, abords, vestiaires, buvette; contrôler le nettoyage, les déchets, éclairages et la fermeture.</p>
+
+                    <div class="pdf-section-title">6 Validation et transmission</div>
+                    <p>Fiche établie le: ${document.getElementById('av_date_etablie').value} | Transmise à la mairie le: ${document.getElementById('av_date_transmise').value}</p>
+                    <p><b>Validation du président:</b> ${document.getElementById('av_president').value} | <b>Date:</b> ${document.getElementById('av_date_val').value}</p>
+                    <p style="font-size:9px; font-style:italic; margin-top:8px;">Toute modification de l'organisation prévue fera l'objet d'une mise à jour transmise à la mairie.</p>
+                </div>
+                `;
+            } else {
+                html = `
+                <div class="pdf-page">
+                    <div class="pdf-header">
+                        <div class="pdf-header-left">
+                            <img src="logo192.png" class="pdf-logo" onerror="this.style.display='none'">
+                            <div class="pdf-title-block">
+                                <h2>US MOUY FOOTBALL</h2>
+                                <p><b>Fiche après rencontre</b> - Stade principal de Mouy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size:10px; font-style:italic; margin-bottom:10px;">À compléter après la rencontre et à transmettre à la mairie pour rendre compte de l'utilisation et de l'état des installations[span_4](start_span)[span_4](end_span).</p>
+
+                    <div class="pdf-section-title">1 Rencontre et utilisation effective</div>
+                    <p><b>Rencontre:</b> [X] ${document.getElementById('ap_statut').value} | <b>Responsable présent:</b> ${document.getElementById('ap_resp').value}</p>
+                    <p><b>Ouverture effective:</b> ${document.getElementById('ap_ouv').value} | <b>Fermeture:</b> ${document.getElementById('ap_ferm').value}</p>
+                    <p><b>Changement constaté:</b> ${document.getElementById('ap_changement').value}</p>
+
+                    <div class="pdf-section-title">2 État des lieux et contrôles réalisés</div>
+                    <p><b>Responsable du contrôle:</b> ${document.getElementById('ap_resp_ctrl').value} | <b>Date:</b> ${document.getElementById('ap_date_ctrl').value}</p>
+                    <p><b>Contrôle initial à:</b> ${document.getElementById('ap_ctrl_init').value} | <b>Contrôle final à:</b> ${document.getElementById('ap_ctrl_fin').value}</p>
+
+                    <table class="pdf-table">
+                        <tr><th>Point contrôlé</th><th>État à l'arrivée</th><th>État au départ</th></tr>
+                        <tr><td>Terrain et abords</td><td>${document.getElementById('ap_t_arr').value}</td><td>${document.getElementById('ap_t_dep').value}</td></tr>
+                        <tr><td>Vestiaires et sanitaires</td><td>${document.getElementById('ap_v_arr').value}</td><td>${document.getElementById('ap_v_dep').value}</td></tr>
+                        <tr><td>Buvette et rangement</td><td>${document.getElementById('ap_b_arr').value}</td><td>${document.getElementById('ap_b_dep').value}</td></tr>
+                        <tr><td>Déchets, mégots et poubelles</td><td>${document.getElementById('ap_d_arr').value}</td><td>${document.getElementById('ap_d_dep').value}</td></tr>
+                        <tr><td>Portes et fenêtres</td><td>${document.getElementById('ap_p_arr').value}</td><td>${document.getElementById('ap_p_dep').value}</td></tr>
+                        <tr><td>Éclairages</td><td>${document.getElementById('ap_e_arr').value}</td><td>${document.getElementById('ap_e_dep').value}</td></tr>
+                    </table>
+                    <p style="font-size:10px; margin-top:4px;"><b>À la fermeture:</b> [X] Éclairages éteints | [X] Fenêtres fermées | [X] Accès verrouillés</p>
+
+                    <div class="pdf-section-title">3 Anomalies et incidents constatés</div>
+                    <p>${document.getElementById('ap_anomalies_txt').value}</p>
+                    <p><b>Signalement transmis à:</b> ${document.getElementById('ap_signalement').value}</p>
+                    <p><b>Photos jointes:</b> ${uploadedPhotos.length > 0 ? 'Oui (' + uploadedPhotos.length + ')' : 'Non'}</p>`;
+
+                    if(uploadedPhotos.length > 0) {
+                        html += `<div style="display:flex; gap:8px; margin-top:5px;">`;
+                        uploadedPhotos.forEach(img => {
+                            html += `<img src="${img}" style="width:70px; height:70px; object-fit:cover; border:1px solid #777;">`;
+                        });
+                        html += `</div>`;
+                    }
+
+                html += `
+                    <div class="pdf-section-title">4 Validation et transmission</div>
+                    <p><b>Nom et signature du responsable:</b> ${document.getElementById('ap_resp_ctrl').value}</p>`;
+
+                    if(canvas) {
+                        html += `<img src="${canvas.toDataURL()}" style="max-height:45px; margin-top:4px;">`;
+                    }
+
+                html += `
+                    <p style="margin-top:6px;"><b>Validation du président:</b> Khalid Bouchehait</p>
+                </div>`;
+            }
+
+            content.innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        function fermerApercu() { document.getElementById('printModal').style.display = 'none'; }
+
+        function partagerDirigeants(type) {
+            const text = `Bonjour les dirigeants, voici la fiche US Mouy (${type === 'avant' ? 'Avant Rencontre' : 'Après Rencontre'}) complétée.`;
+            if (navigator.share) {
+                navigator.share({ title: 'US Mouy Football', text: text, url: window.location.href }).catch(() => {});
+            } else {
+                prompt("Copiez ce lien pour le partager :", window.location.href);
+            }
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-banner').style.display = 'block';
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('psw-install-banner').style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("Pour installer l'application :\n- Sur Android : Menu Chrome (3 points) > 'Installer l'application'.\n- Sur iPhone : Bouton Partager Safari > 'Sur l'écran d'accueil'.");
+            }
+        }
+    </script>
+</body>
+</html>
